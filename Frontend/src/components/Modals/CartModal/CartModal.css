@@ -1,0 +1,158 @@
+.cart__modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.cart__modal-content {
+  background-color: rgba(246, 224, 158, 0.95);
+  border: 5px solid #8b4513;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.cart__modal-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.cart__modal-item {
+  background: rgba(210, 180, 140, 0.9);
+  border: 3px solid #8b4513;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cart__modal-item-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.cart__modal-item-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.cart__modal-item-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 2px solid #8b4513;
+  border-radius: 4px;
+}
+
+.cart__modal-item-price {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.cart__modal-item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.cart__modal-item-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.cart__modal-summary {
+  margin-top: 20px;
+  font-size: 1.2rem;
+}
+
+.cart__modal-checkout-btn {
+  background-color: #8b4513;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.cart__modal-checkout-btn:hover {
+  background-color: #704214;
+}
+
+.cart__modal-error {
+  color: red;
+  margin-bottom: 10px;
+}
+
+.cart__modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.cart__modal-saved-section {
+  margin-top: 20px;
+}
+
+.cart__modal-section-header {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  color: #8b4513;
+  text-align: center;
+  width: 100%;
+}
+
+.cart__modal-item-save,
+.cart__modal-item-move,
+.cart__modal-item-remove {
+  background-color: #8b4513;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cart__modal-item-save:hover,
+.cart__modal-item-move:hover,
+.cart__modal-item-remove:hover {
+  background-color: #704214;
+}
+
+.card__remove {
+  background-color: #8b4513;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.card__remove:hover {
+  background-color: #704214;
+}

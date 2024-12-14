@@ -1,0 +1,26 @@
+.card {
+  border: 5px solid #8b4513;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(246, 224, 158, 0.8);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.card__image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+}
+
+.card__image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Add other base styles from Products.css and FeaturedProducts.css */

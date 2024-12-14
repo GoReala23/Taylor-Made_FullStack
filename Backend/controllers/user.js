@@ -1,87 +1,209 @@
-const User = require('../models/users');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const validator = require('validator');
+const User = require('../models/user');
 const { JWT_SECRET } = require('../utils/config');
 
-const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+const BadRequestError = require('../errors/BadRequestError');
+const ConflictError = require('../errors/ConflictError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
+const NotFoundError = require('../errors/NotFoundError');
+const ServerError = require('../errors/ServerError');
+const speakeasy = require('speakeasy');
+const qrcode = require('qrcode');
 
+const setupTwoFactor = async (req, res) => {
   try {
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
-    }
-    user = new User({
-      name,
-      email,
-      password,
-    });
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-    await user.save();
-    res.status(201).json({ msg: 'User created' });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
-  }
-};
-
-// Login User
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Use the static method to find the user and validate password
-    const user = await User.findUserByCredentials(email, password);
-
-    // Generate a JWT token
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '12h' });
-
-    res.json({ token }); // Return the token to the client
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
-
-const getUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+
+    const secret = speakeasy.generateSecret({
+      name: 'TaylorMade',
+      length: 20,
+    });
+
+    user.twoFactorSecret = secret.base32; // Save the secret in base32 format
+    await user.save();
+
+    const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url);
+    console.log('Generated Secret:', secret.base32); // Debugging Log
+    res.json({ secret: secret.base32, qrCodeUrl });
+  } catch (error) {
+    console.error('Error setting up 2FA:', error);
+    res
+      .status(500)
+      .json({ message: 'Error setting up 2FA', error: error.message });
   }
 };
-
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find().select('-password');
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-};
-
-const updateUser = async (req, res) => {
-  const { name, email } = req.body;
+const verifyTwoFactor = async (req, res) => {
+  const { token } = req.body;
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user.id,
-      { name, email },
-      { new: true, runValidators: true }
-    ).select('-password'); // Do not return password
-
-    if (!updatedUser) {
+    const user = await User.findById(req.user._id);
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(updatedUser);
+    if (!user.twoFactorSecret) {
+      return res.status(400).json({ message: '2FA not set up' });
+    }
+
+    console.log('User Secret:', user.twoFactorSecret);
+    console.log('Provided Token:', token);
+
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: 'base32',
+      token,
+      window: 2,
+    });
+
+    if (verified) {
+      user.twoFactorEnabled = true;
+      await user.save();
+      return res.json({ message: '2FA verification successful' });
+    } else {
+      return res.status(401).json({
+        message: 'Invalid 2FA token',
+        remainingTime: 30 - (Math.floor(Date.now() / 1000) % 30),
+      });
+    }
+  } catch (error) {
+    console.error('Error verifying 2FA:', error);
+    res
+      .status(500)
+      .json({ message: 'Error verifying 2FA', error: error.message });
+  }
+};
+const createUser = async (req, res, next) => {
+  const { name, email, password } = req.body;
+
+  try {
+    console.log('Registering user:', { name, email });
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      console.log('User already exists:', email);
+      return next(new ConflictError('User already exists'));
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+    const user = await User.create({ name, email, password: hash });
+
+    console.log('User registered successfully:', user.email);
+    return res.status(201).send({ name: user.name, email: user.email });
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('Error in createUser:', err);
+    if (err.name === 'ValidationError') {
+      return next(new BadRequestError('Validation error'));
+    }
+    return next(new ServerError('An error occurred while creating the user'));
   }
 };
 
-module.exports = { registerUser, loginUser, getUser, getUsers, updateUser };
+// Controller function for user login
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(new BadRequestError('Both email and password are required'));
+  }
+
+  if (!validator.isEmail(email)) {
+    return next(new BadRequestError('Invalid email format'));
+  }
+
+  try {
+    // Find user by credentials
+    const user = await User.findUserByCredentials(email, password);
+
+    // Generate token
+    const token = jwt.sign(
+      { userId: user._id.toString(), isAdmin: user.isAdmin },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    console.log(JWT_SECRET);
+    console.log(token);
+
+    // Respond with token and user details
+    return res.send({
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+    });
+  } catch (err) {
+    if (err.message === 'Incorrect email or password') {
+      return next(new UnauthorizedError('Incorrect email or password'));
+    }
+    return next(new ServerError('Authentication failed'));
+  }
+};
+
+// Controller function to get the current logged-in user
+const getCurrentUser = async (req, res, next) => {
+  const userId = req.user._id;
+
+  console.log('Attempting to fetch user:', userId);
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      console.error('User not found:', userId);
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {},
+      });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    next(error);
+  }
+};
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({}).select('-password');
+    return res.status(200).send(users);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+// Controller function to update user data
+const updateUser = async (req, res, next) => {
+  const { name, email } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, email },
+      { new: true }
+    );
+    if (!user) {
+      return next(new NotFoundError('User not found'));
+    }
+
+    return res.status(200).send(user);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = {
+  getCurrentUser,
+  getAllUsers,
+  updateUser,
+  createUser,
+  login,
+  setupTwoFactor,
+  verifyTwoFactor,
+};

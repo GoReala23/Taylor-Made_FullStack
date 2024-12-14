@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { validate } = require('./users');
+const { validate } = require('./user');
 
 const orderSchema = new mongoose.Schema({
   user: {
@@ -15,10 +15,10 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  items: [
+  item: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Item',
+      ref: 'item',
       required: true,
     },
   ],
@@ -28,8 +28,8 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Shipped', 'Delivered'],
-    default: 'Pending',
+    enum: ['pending', 'shipped', 'delivered', 'returned', 'cancelled'],
+    default: 'pending',
   },
   createdAt: {
     type: Date,

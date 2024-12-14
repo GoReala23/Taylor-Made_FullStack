@@ -4,7 +4,12 @@ module.exports = {
     es2021: true,
     jest: true,
   },
-  extends: ['plugin:react/recommended', 'airbnb-base', 'eslint:recommended'],
+  extends: [
+    'plugin:react/recommended',
+    'airbnb-base',
+    'eslint:recommended',
+    'plugin:prettier/recommended',
+  ],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -19,7 +24,19 @@ module.exports = {
     'react/jsx-uses-vars': 'error',
     'no-unused-vars': 'warn',
     'comma-dangle': ['error', 'always-multiline'],
-    'linebreak-style': ['error', 'unix'],
+    'linebreak-style': 'off',
+    'react/prop-types': 'off',
+    'implicit-arrow-linebreak': 'off',
+    'operator-linebreak': 'off',
+    'no-underscore-dangle': ['error', { allow: ['_id'] }],
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+        singleQuote: true,
+        jsxSingleQuote: true,
+      },
+    ],
   },
   settings: {
     react: {
