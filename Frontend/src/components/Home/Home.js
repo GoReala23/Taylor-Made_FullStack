@@ -5,6 +5,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { CartContext } from '../../context/CartContext';
 import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
+import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
 import Card from '../Card/Card';
 import Api from '../../utils/Api';
 import './Home.css';
@@ -43,16 +44,6 @@ const Home = () => {
     setPreviewProduct(null);
   };
 
-  const handleQuantityChange = async (newQuantity) => {
-    try {
-      await updateCartItemQuantity(previewProduct._id, newQuantity);
-      setPreviewQuantity(newQuantity);
-    } catch (err) {
-      console.error('Error updating quantity:', error);
-      alert('An error occurred while updating the cart. Please try again.');
-    }
-  };
-
   const handleAddToCart = async (product) => {
     if (!product || !product._id) {
       console.error('Invalid product data');
@@ -81,15 +72,36 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setIsLoading(true);
         const fetchedProducts = await Api.getItems();
-        setProducts(fetchedProducts);
-      } catch (cartError) {
+        const validProducts = fetchedProducts.filter(
+          (product) =>
+            product && product.name && product.price && product.imageUrl,
+        );
+        setProducts(validProducts);
+      } catch (productError) {
         console.error('Error fetching products:', error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const fetchedOrders = await Api.getUserOrders(token);
+        setOrders(fetchedOrders);
+      } catch (orderError) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+
+    fetchOrders();
+  }, []);
   const handleViewMore = (section) => {
     switch (section) {
       case 'Featured Products':
@@ -133,138 +145,155 @@ const Home = () => {
     }
   };
 
-  const renderProductGrid = (items, title, limit = 4) => (
-    <section className='home__section'>
-      <div className='home__section-title'>{title}</div>
-      <div className='home__grid'>
-        {items.slice(0, limit).map((product) => (
-          <Card
-            key={product._id}
-            product={product}
-            isAdmin={false}
-            onAddToCart={() => handleAddToCart(product)}
-            onBuyNow={() => handleBuyNow(product)}
-            onFavorite={() => toggleFavorite(product)}
-            onClick={() => openPreview(product)}
-            showQuantity={true}
-            initialQuantity={1}
-          />
-        ))}
-      </div>
-    </section>
-  );
-
-  const renderCartSection = () => {
-    if (isLoading) {
-      return <p>Loading cart...</p>;
+  const renderOrdersSection = () => {
+    if (orders.length === 0) {
+      return <p>You have no orders.</p>;
     }
 
+    return (
+      <section className='home__section'>
+        <div className='home__section-title'>My Orders</div>
+        <div className='home__grid'>
+          {orders.map((order) =>
+            order.item.map((product) => (
+              <Card
+                key={product._id}
+                product={{ ...product, price: product.price }}
+                isFeatured={product.isFeatured}
+                isAdmin={false}
+                onAddToCart={() => handleAddToCart(product)}
+                onBuyNow={() => handleBuyNow(product)}
+                onFavorite={toggleFavorite}
+                onClick={() => openPreview(product)}
+                showQuantity={false}
+                initialQuantity={1}
+              />
+            )),
+          )}
+        </div>
+        <button
+          className='home__view-more'
+          onClick={() => handleViewMore('Orders')}
+        >
+          View More
+        </button>
+      </section>
+    );
+  };
+
+  const renderProductGrid = (items, title, limit = 4) => {
+    const mealPlanClassName = 'home__meal-plan-section';
+    if (title === 'Meal Plans') {
+      return (
+        <section className={`home__section ${mealPlanClassName}`}>
+          <div className='home__section-title'>{title}</div>
+          <div className='home__grid home__grid-placeholder'>
+            <div className='home__placeholder-message'>
+              <h3>Cooking Up Some Delicious Plans!</h3>
+              <p>
+                {
+                  "We're busy in the kitchen, whipping up some tasty meal plans "
+                }
+                {'just for you!'}
+              </p>
+              <p>{'Stay tuned for our culinary creations coming soon!'}</p>
+            </div>
+          </div>
+          <button
+            className='home__view-more'
+            onClick={() => handleViewMore(title)}
+          >
+            Get Updates!
+          </button>
+        </section>
+      );
+    }
+
+    return (
+      <section className='home__section'>
+        <div className='home__section-title'>{title}</div>
+        <div className='home__grid'>
+          {items.slice(0, limit).map((product) => (
+            <Card
+              key={product._id}
+              product={product}
+              isFeatured={product.isFeatured}
+              isAdmin={false}
+              onAddToCart={() => handleAddToCart(product)}
+              onBuyNow={() => handleBuyNow(product)}
+              onFavorite={toggleFavorite}
+              onClick={() => openPreview(product)}
+              showQuantity={false}
+              initialQuantity={1}
+            />
+          ))}
+        </div>
+        <button
+          className='home__view-more'
+          onClick={() => handleViewMore(title)}
+        >
+          View More
+        </button>
+      </section>
+    );
+  };
+
+  const renderCartSection = () => {
     if (error) {
       return <p>Error: {error}</p>;
     }
 
-    if (cartItems.length === 0) {
+    if (!cartItems || cartItems.length === 0) {
       return <p>Your cart is empty.</p>;
     }
 
     return (
-      <section className='home__cart'>
-        <h2>My Cart</h2>
-        <ul className='home__cart-list'>
+      <section className='home__section'>
+        <div className='home__section-title'>My Cart</div>
+        <div className='home__grid'>
           {cartItems.map((item) => (
-            <li key={item.product?._id} className='home__cart-item'>
-              {item.product && (
-                <>
-                  <img
-                    src={item.product.imageUrl || '/default-product-image.jpg'}
-                    alt={item.product.name || 'Product Name'}
-                    className='home__cart-image'
-                  />
-                  <div className='home__cart-info'>
-                    <h3>{item.product.name || 'Product Name'}</h3>
-                    <p>Price: {(item.product.price || 0).toFixed(2)}</p>
-                    <p>Quantity: {item.quantity || 1}</p>
-                  </div>
-                </>
-              )}
-            </li>
+            <Card
+              key={item.product?._id}
+              product={item.product}
+              isFeatured={false}
+              isAdmin={false}
+              onAddToCart={() => handleAddToCart(item.product)}
+              onBuyNow={() => handleBuyNow(item.product)}
+              onFavorite={toggleFavorite}
+              onClick={() => openPreview(item.product)}
+              initialQuantity={item.quantity}
+            />
           ))}
-        </ul>
+        </div>
+        <button
+          className='home__view-more'
+          onClick={() => handleViewMore('My cart')}
+        >
+          View More
+        </button>
       </section>
     );
   };
   return (
     <div className='home__container'>
-      {showPreview && (
-        <div className='home__preview-overlay' onClick={closePreview}>
-          <div
-            className='home__preview-container'
-            ref={previewRef}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button className='home__close-preview' onClick={closePreview}>
-              &times;
-            </button>
-            {previewProduct && (
-              <>
-                <img
-                  src={previewProduct.imageUrl}
-                  alt={previewProduct.name}
-                  className='home__preview-image'
-                />
-                <h3 className='home__preview-title'>{previewProduct.name}</h3>
-                <p className='home__preview-price'>${previewProduct.price}</p>
-                <p className='card__price-per-quantity'>
-                  Total: $
-                  {(previewProduct.price * previewProduct.quantity).toFixed(2)}
-                </p>
-                <p className='home__preview-description'>
-                  {previewProduct.description}
-                </p>
-
-                <div className='home__quantity-controls'>
-                  <button
-                    className='home__minus-btn'
-                    onClick={() =>
-                      handleQuantityChange(Math.max(1, previewQuantity - 1))
-                    }
-                  >
-                    -
-                  </button>
-                  <span className='home__current-quantity'>
-                    {previewQuantity}
-                  </span>
-                  <button
-                    className='home__plus-btn'
-                    onClick={() => handleQuantityChange(previewQuantity + 1)}
-                  >
-                    +
-                  </button>
-                </div>
-                <div className='home__preview-actions'>
-                  <button
-                    className='home__add-to-cart'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToCart(previewProduct);
-                      closePreview();
-                    }}
-                  >
-                    Add to Cart
-                  </button>
-                  <button className='home__buy-now'>Buy Now</button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-      ,{renderProductGrid(featuredProducts, 'Featured Products')}
+      <PreviewOverlay
+        isOpen={showPreview}
+        onClose={closePreview}
+        product={previewProduct}
+        isFeatured={previewProduct?.isFeatured}
+        quantity={previewQuantity}
+        isLiked={favorites?.some((fav) => fav._id === previewProduct?._id)}
+        onQuantityChange={(newQuantity) => setPreviewQuantity(newQuantity)}
+        onAddToCart={() => addToCart(previewProduct)}
+        onBuyNow={() => handleBuyNow(previewProduct)}
+        onFavorite={toggleFavorite}
+      />
+      {renderProductGrid(featuredProducts, 'Featured Products')}
       {renderProductGrid(products, 'Products')}
       {renderProductGrid(favorites, 'Favorites')}
-      {renderCartSection()}
+      {renderCartSection(cartItems, 'Cart')}
       {renderProductGrid(mealPlans, 'Meal Plans')}
-      {renderProductGrid(orders, 'Orders')}
+      {renderOrdersSection(orders, 'Orders')}
     </div>
   );
 };

@@ -1,6 +1,7 @@
 const Cart = require('../models/cart');
 const Item = require('../models/item');
 const User = require('../models/user');
+const Product = require('../models/item');
 
 // Add item to cart
 const addItemToCart = async (req, res, next) => {
@@ -57,14 +58,67 @@ const removeItemFromCart = async (req, res, next) => {
 
 // Update item quantity in cart
 
-const updateCartItemQuantity = async (req, res) => {
-  try {
-    const { productId, newQuantity } = req.body;
+const updateCartItemQuantity = async (req, res, next) => {
+  const { productId, newQuantity } = req.body;
+  const userId = req.user._id;
 
-    res.status(200).json({ message: 'Cart quantity updated successfully' });
+  try {
+    // Find the cart for the user
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    // Find the item in the cart
+    const itemIndex = cart.items.findIndex(
+      (item) => item.product.toString() === productId
+    );
+
+    // If the item is not found, return an error
+    if (itemIndex === -1) {
+      return res.status(404).json({ message: 'Item not found in cart' });
+    }
+
+    // Update the quantity of the item
+    cart.items[itemIndex].quantity = newQuantity;
+    await cart.save();
+
+    res
+      .status(200)
+      .json({ message: 'Cart item quantity updated successfully', cart });
   } catch (error) {
-    console.error('Error updating cart quantity:', error);
-    res.status(400).json({ error: 'Failed to update cart quantity' });
+    res
+      .status(500)
+      .json({ message: 'Error updating cart', error: error.message });
+  }
+};
+// Update saved item quantity
+const updateSavedItemQuantity = async (req, res) => {
+  const { savedItemId, newQuantity } = req.body;
+  const userId = req.user._id;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Find the saved item by its _id
+    const savedItem = user.savedItems.find(
+      (item) => item._id.toString() === savedItemId
+    );
+    if (!savedItem) {
+      return res.status(404).json({ error: 'Saved item not found' });
+    }
+
+    savedItem.quantity = newQuantity;
+    await user.save();
+
+    res.status(200).json({
+      message: 'Saved item quantity updated successfully',
+      savedItems: user.savedItems,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 // Get cart contents
@@ -73,6 +127,7 @@ const getCart = async (req, res, next) => {
 
   try {
     let cart = await Cart.findOne({ user: userId }).populate('items.product');
+
     console.log('Existing Cart data:', cart);
 
     if (!cart) {
@@ -86,105 +141,117 @@ const getCart = async (req, res, next) => {
     next(error);
   }
 };
-
 const moveToCart = async (req, res, next) => {
   const { productId } = req.params;
   const userId = req.user._id;
 
   try {
-    // Remove from saved items
-
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    if (!user.savedItems) {
-      user.savedItems = [];
+    const savedItem = user.savedItems.find(
+      (item) => item.product && item.product.toString() === productId
+    );
+    if (!savedItem) {
+      return res.status(404).json({ message: 'Saved item not found' });
     }
 
-    user.savedItems = user.savedItems.filter(
-      (item) => item.toString() !== productId
-    );
-    await user.save();
-
-    // Add to cart
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
       cart = await Cart.create({ user: userId, items: [] });
     }
 
-    cart.items.push({ product: productId, quantity: 1 });
-    await cart.save();
-
-    res.status(200).json({ message: 'Item moved to cart' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const removeSaved = async (req, res, next) => {
-  const { productId } = req.params;
-  const userId = req.user._id;
-
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Initialize savedItems if undefined
-    if (!user.savedItems) {
-      user.savedItems = [];
+    const existingCartItem = cart.items.find(
+      (item) => item.product && item.product.toString() === productId
+    );
+    if (existingCartItem) {
+      existingCartItem.quantity += savedItem.quantity;
+    } else {
+      cart.items.push({
+        product: savedItem.product,
+        quantity: savedItem.quantity,
+      });
     }
 
     user.savedItems = user.savedItems.filter(
-      (item) => item.toString() !== productId
+      (item) => item.product && item.product.toString() !== productId
     );
-    await user.save();
+    await Promise.all([cart.save(), user.save()]);
 
-    res.status(200).json({ message: 'Item removed from saved items' });
+    await cart.populate('items.product');
+    res.status(200).json({ message: 'Item moved to cart', cart });
   } catch (error) {
-    next(error);
+    res
+      .status(500)
+      .json({ message: 'Error moving item to cart', error: error.message });
   }
 };
-
-const saveForLater = async (req, res, next) => {
+const removeSaved = async (req, res, next) => {
+  console.log('Removing saved item:', req.params.productId);
   const { productId } = req.params;
   const userId = req.user._id;
-
   try {
-    // First find the user
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+    console.log('Before removal:', user.savedItems);
 
-    // Get cart item quantity before removing
-    let cart = await Cart.findOne({ user: userId });
-    const cartItem = cart?.items.find(
-      (item) => item.product.toString() === productId
+    user.savedItems = user.savedItems.filter(
+      (item) => item.product && item.product.toString() !== productId
     );
-    const quantity = cartItem ? cartItem.quantity : 1;
+    console.log('After removal:', user.savedItems);
+    await user.save();
+    res.status(200).json({ message: 'Saved item removed successfully' });
+  } catch (error) {
+    console.error('Error removing saved item:', error);
+    next(error);
+  }
+};
+const getSavedItems = async (req, res, next) => {
+  const userId = req.user._id;
+  try {
+    const user = await User.findById(userId).populate('savedItems.product');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user.savedItems);
+  } catch (error) {
+    next(error);
+  }
+};
+const saveForLater = async (req, res, next) => {
+  const { productId } = req.params;
+  const userId = req.user._id;
+  try {
+    const cart = await Cart.findOne({ user: userId });
+    const user = await User.findById(userId);
 
-    // Initialize savedItems if needed
-    if (!user.savedItems) {
-      user.savedItems = [];
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // Add to saved items
-    user.savedItems.push({ productId, quantity });
-    await user.save();
-
-    // Remove from cart
-    if (cart) {
+    const cartItem = cart.items.find(
+      (item) => item.product.toString() === productId
+    );
+    if (cartItem) {
+      user.savedItems.push({
+        product: productId,
+        quantity: cartItem.quantity,
+      });
       cart.items = cart.items.filter(
         (item) => item.product.toString() !== productId
       );
-      await cart.save();
+
+      await Promise.all([cart.save(), user.save()]);
     }
 
-    res.status(200).json({ message: 'Item saved for later successfully' });
+    // Return the saved items for better visualization
+    res
+      .status(200)
+      .json({ message: 'Item saved for later', savedItems: user.savedItems });
   } catch (error) {
     next(error);
   }
@@ -197,5 +264,7 @@ module.exports = {
   addItemToCart,
   removeItemFromCart,
   updateCartItemQuantity,
+  updateSavedItemQuantity,
   getCart,
+  getSavedItems,
 };

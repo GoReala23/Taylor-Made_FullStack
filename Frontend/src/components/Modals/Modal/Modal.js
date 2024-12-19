@@ -19,7 +19,7 @@ const Modal = ({ isOpen, onClose, children, customContentClass }) => {
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}
       >
-        <button className='close__button' onClick={handleClose}>
+        <button className='modal__close' onClick={handleClose}>
           &times;
         </button>
         {children}

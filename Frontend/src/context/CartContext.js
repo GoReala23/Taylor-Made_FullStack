@@ -13,16 +13,26 @@ export const CartProvider = ({ children }) => {
   const fetchCart = async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('No authentication token found');
-        alert('Please log in to view your cart.');
-        return;
+      const response = await Api.getCart(token);
+      console.log('Fetched cart:', response);
+      if (response && response.items && Array.isArray(response.items)) {
+        setCartItems(response.items.filter((item) => item && item.product));
+      } else {
+        setCartItems([]);
       }
-      const cart = await Api.getCart(token);
-      setCartItems(cart.items || []);
     } catch (error) {
       console.error('Error fetching cart:', error);
-      alert('Failed to fetch cart. Please try again later.');
+      setCartItems([]);
+    }
+  };
+
+  const getSavedItems = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await Api.getSavedItems(token);
+      setSavedItems(response);
+    } catch (error) {
+      console.error('Error fetching saved items:', error);
     }
   };
 
@@ -40,13 +50,11 @@ export const CartProvider = ({ children }) => {
       const existingItemIndex = cartItems.findIndex(
         (item) => item.product._id === product._id,
       );
-
       if (existingItemIndex !== -1) {
         // Update existing item quantity
         const updatedItems = [...cartItems];
         updatedItems[existingItemIndex].quantity += quantity;
         setCartItems(updatedItems);
-
         // Update in backend
         await Api.updateCartQuantity(
           product._id,
@@ -56,13 +64,14 @@ export const CartProvider = ({ children }) => {
       } else {
         // Add new item
         await Api.addToCart({ productId: product._id, quantity }, token);
-        await fetchCart(); // Refresh cart contents
+        await fetchCart();
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
       throw error;
     }
   };
+
   const calculateTotal = (price, quantity) => {
     if (typeof price !== 'number' || typeof quantity !== 'number') {
       console.warn('Invalid price or quantity', { price, quantity });
@@ -70,6 +79,7 @@ export const CartProvider = ({ children }) => {
     }
     return (price * quantity).toFixed(2);
   };
+
   const calculateCartTotal = () => {
     return cartItems
       .reduce((total, item) => {
@@ -78,6 +88,35 @@ export const CartProvider = ({ children }) => {
         return total + price * quantity;
       }, 0)
       .toFixed(2);
+  };
+
+  const updateCartItemQuantity = async (productId, newQuantity) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await Api.updateCartQuantity(
+        productId,
+        newQuantity,
+        token,
+      );
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      await fetchCart(); // Refresh cart contents
+    } catch (error) {
+      console.error('Error updating cart quantity:', error);
+      throw error;
+    }
+  };
+
+  const updateSavedItemQuantity = async (productId, newQuantity) => {
+    try {
+      const token = localStorage.getItem('token');
+      await Api.updateSavedItemQuantity(productId, newQuantity, token);
+      await getSavedItems();
+    } catch (error) {
+      console.error('Error updating saved item quantity:', error);
+      throw error;
+    }
   };
 
   const removeFromCart = async (productId) => {
@@ -92,13 +131,24 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const removeSavedItem = async (product) => {
+  const removeSavedItem = async (productData) => {
     try {
+      const productId =
+        typeof productData === 'string' ? productData : productData._id;
+      if (!productId) {
+        console.error('Invalid product data');
+        return;
+      }
       const token = localStorage.getItem('token');
-      await Api.removeSaved(product._id, token);
-      setSavedItems((prev) => prev.filter((item) => item._id !== product._id));
+      await Api.removeSaved(productId, token);
+      setSavedItems((prev) =>
+        prev.filter((item) => {
+          const itemId = item.product ? item.product._id : item._id;
+          return itemId !== productId;
+        }),
+      );
     } catch (error) {
-      console.error('Error removing saved item:', error);
+      console.error('Error removing item:', error);
     }
   };
 
@@ -106,39 +156,77 @@ export const CartProvider = ({ children }) => {
     try {
       const token = localStorage.getItem('token');
       const cartItem = cartItems.find((item) => item.product._id === productId);
-      if (!cartItem) return;
+      const quantity = cartItem ? cartItem.quantity : 1;
 
-      await Api.saveForLater(productId, token, cartItem.quantity);
-      await fetchCart();
+      console.log('Saving item for later:', { productId, quantity });
+      await Api.saveForLater(productId, token, quantity);
+      console.log('Item saved successfully');
+
+      setCartItems((prev) =>
+        prev.filter((item) => item.product._id !== productId),
+      );
+      const updatedSavedItems = await Api.getSavedItems(token);
+      console.log('Updated saved items:', updatedSavedItems);
+      setSavedItems(updatedSavedItems);
     } catch (error) {
       console.error('Error saving for later:', error);
     }
   };
-  const updateCartItemQuantity = async (productId, newQuantity) => {
+  const moveToCart = async (productId) => {
     try {
-      await Api.updateCartQuantity(productId, newQuantity);
-      await fetchCart();
-    } catch (error) {
-      console.error('Error updating cart quantity:', error);
-      throw error;
-    }
-  };
-
-  const moveToCart = async (product) => {
-    try {
+      if (!productId) {
+        throw new Error('Invalid product data');
+      }
       const token = localStorage.getItem('token');
-      await Api.moveToCart(product._id, token);
+      await Api.moveToCart(productId, token);
+      await removeSavedItem(productId);
       await fetchCart();
     } catch (error) {
       console.error('Error moving item to cart:', error);
     }
   };
+
   const buyNow = async (product) => {
     try {
       await addToCart(product);
     } catch (error) {
       console.error('Error processing purchase:', error);
       throw error;
+    }
+  };
+
+  const handleQuantityChange = async (productId, newQuantity, isSavedItem) => {
+    try {
+      console.log('Updating quantity:', {
+        productId,
+        newQuantity,
+        isSavedItem,
+      });
+      if (isSavedItem) {
+        await updateSavedItemQuantity(productId, newQuantity);
+        setSavedItems((prev) =>
+          prev.map((item) => {
+            if (item.product._id === productId) {
+              console.log('Updated saved item quantity:', newQuantity);
+              return { ...item, quantity: newQuantity };
+            }
+            return item;
+          }),
+        );
+      } else {
+        await updateCartItemQuantity(productId, newQuantity);
+        setCartItems((prev) =>
+          prev.map((item) => {
+            if (item.product._id === productId) {
+              console.log('Updated cart item quantity:', newQuantity);
+              return { ...item, quantity: newQuantity };
+            }
+            return item;
+          }),
+        );
+      }
+    } catch (error) {
+      console.error('Error updating quantity:', error);
     }
   };
 
@@ -157,6 +245,8 @@ export const CartProvider = ({ children }) => {
         buyNow,
         calculateTotal,
         calculateCartTotal,
+        getSavedItems,
+        handleQuantityChange,
       }}
     >
       {children}

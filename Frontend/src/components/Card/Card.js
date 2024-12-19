@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { FaHeart, FaStar, FaPlus, FaMinus } from 'react-icons/fa';
 import PropTypes from 'prop-types';
-import Api from '../../utils/Api';
+import { useFavorites } from '../../context/FavoritesContext';
 import './Card.css';
 import { CartContext } from '../../context/CartContext';
 
@@ -13,7 +13,6 @@ const Card = ({
   onFavorite,
   onSaveForLater,
   onToggleFeatured,
-  onQuantityChange,
   onMoveToCart,
   onRemove,
   isSavedItem = false,
@@ -22,9 +21,11 @@ const Card = ({
   isFeatured,
   ...props
 }) => {
+  const { favorites, toggleFavorite } = useFavorites();
   const [quantity, setQuantity] = useState(initialQuantity);
-  const { calculateTotal, fetchCart, updateCartItemQuantity } =
-    useContext(CartContext);
+  const { handleQuantityChange } = useContext(CartContext);
+
+  const isLiked = favorites?.some((fav) => fav._id === product._id);
 
   const {
     name = 'Unnamed Product',
@@ -38,32 +39,11 @@ const Card = ({
     return null;
   }
 
-  const actualProduct = product.product || product;
-
-  if (
-    !actualProduct ||
-    typeof actualProduct.price !== 'number' ||
-    !actualProduct.name
-  ) {
-    console.warn('Invalid product data:', actualProduct);
-    return null;
-  }
-
-  if (!product || typeof product.price !== 'number' || !product.name) {
-    console.warn('Invalid product data:', product);
-    return null;
-  }
-
-  const handleQuantityChange = (newQuantity) => {
-    if (newQuantity < 1) return;
-    setQuantity(newQuantity);
-    onQuantityChange(product._id, newQuantity);
-  };
-
   const handleInputChange = (e) => {
     const newQuantity = parseInt(e.target.value, 10);
     if (!Number.isNaN(newQuantity)) {
-      handleQuantityChange(newQuantity);
+      handleQuantityChange(product._id, newQuantity, isSavedItem);
+      setQuantity(newQuantity);
     }
   };
 
@@ -80,6 +60,17 @@ const Card = ({
       <div className='card__image-container'>
         <img src={imageUrl} alt={name} className='card__image' />
         {isFeatured && <FaStar className='card__featured-star' color='gold' />}
+        <button
+          className='card__favorite-btn'
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onFavorite) {
+              onFavorite(product);
+            }
+          }}
+        >
+          <FaHeart color={isLiked ? '#8b4513' : 'white'} />
+        </button>
       </div>
       <div className='card__info'>
         <h3 className='card__title'>{name}</h3>
@@ -130,18 +121,27 @@ const Card = ({
           </>
         )}
       </div>
-      {showQuantity && onQuantityChange && (
+      {showQuantity && (
         <div className='card__quantity'>
-          <button onClick={() => handleQuantityChange(quantity - 1)}>
+          <button
+            onClick={() =>
+              handleQuantityChange(product._id, quantity - 1, isSavedItem)
+            }
+          >
             <FaMinus />
           </button>
           <input
+            className='card__quantity-input'
             type='number'
             value={quantity}
             onChange={handleInputChange}
             min='1'
           />
-          <button onClick={() => handleQuantityChange(quantity + 1)}>
+          <button
+            onClick={() =>
+              handleQuantityChange(product._id, quantity + 1, isSavedItem)
+            }
+          >
             <FaPlus />
           </button>
           <p className='card__price-per-quantity'>
@@ -167,7 +167,6 @@ Card.propTypes = {
   onFavorite: PropTypes.func,
   onSaveForLater: PropTypes.func,
   onToggleFeatured: PropTypes.func,
-  onQuantityChange: PropTypes.func,
   onMoveToCart: PropTypes.func,
   onRemove: PropTypes.func,
   isSavedItem: PropTypes.bool,

@@ -6,6 +6,7 @@
   background-color: rgba(246, 224, 158, 0.8);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  position: relative;
 }
 
 .card__image-container {
@@ -23,4 +24,34 @@
   object-fit: cover;
 }
 
-/* Add other base styles from Products.css and FeaturedProducts.css */
+.card__quantity-input {
+  width: 30px;
+}
+
+.card__featured-star {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+}
+
+.card__favorite-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.card__info {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.card__price-per-quantity {
+  margin-top: 5px;
+  font-weight: bold;
+  color: #8b4513;
+}

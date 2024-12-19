@@ -30,6 +30,22 @@ const userSchema = new mongoose.Schema({
     required: true,
     select: false,
   },
+  savedItems: [
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'item',
+        required: true,
+      },
+      quantity: {
+        type: Number,
+        default: 1,
+        min: 1,
+      },
+    },
+  ],
+  cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+  orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
 });
 
 userSchema.statics.findUserByCredentials = function (email, password) {

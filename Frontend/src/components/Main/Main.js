@@ -7,7 +7,7 @@ function Main({ onRegister, onLogin }) {
       <h1 className='main__title'>TaylorMade</h1>
       <p className='main__subtitle'>
         {' '}
-        {/* Add subtitle text here if needed */}{' '}
+        {/* might add subtitle text here if needed */}{' '}
       </p>
       <div className='main__buttons'>
         <button

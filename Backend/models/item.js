@@ -36,7 +36,7 @@ const itemSchema = new mongoose.Schema(
       },
       validate: {
         validator: function (v) {
-          return v.length > 0; // Ensure at least one category
+          return v.length > 0;
         },
         message: 'At least one category is required',
       },
@@ -49,6 +49,8 @@ const itemSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    isSaved: { type: Boolean, default: false },
+    savedQuantity: { type: Number, default: 1 },
     isFeatured: {
       type: Boolean,
       default: false,

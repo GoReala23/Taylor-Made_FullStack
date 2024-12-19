@@ -13,12 +13,7 @@ const BuyModal = ({ isOpen, onClose, product, onSwitchToRegister }) => {
 
     try {
       const token = localStorage.getItem('token');
-      await Api.createOrder(
-        product._id,
-        1,
-        values.address, // Add address from form values
-        token,
-      );
+      await Api.createOrder(product._id, 1, values.address, token);
       onClose();
       alert('Order placed successfully!');
     } catch (error) {

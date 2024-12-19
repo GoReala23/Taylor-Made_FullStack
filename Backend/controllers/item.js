@@ -5,20 +5,15 @@ const createItem = async (req, res) => {
   console.log('request body:', req.body);
   console.log('createItem function hit');
   const { name, price, description, imageUrl, categories, isFeatured } =
-    req.body; // Changed from category to categories
+    req.body;
   try {
-    console.log(req.body); // Logs request body for debugging
+    console.log(req.body);
     // Validate request body
     if (!name || !price || !description || !imageUrl || !categories) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
     const itemCategories = categories || [category];
-
-    // Validate that categories is an array
-    // if (!Array.isArray(categories)) {
-    //   return res.status(400).json({ message: 'Categories must be an array' });
-    // }
 
     // Create new item
     const newItem = new Item({
@@ -31,12 +26,12 @@ const createItem = async (req, res) => {
     });
 
     await newItem.save();
-    // Log the new item and its ID to the terminal
+
     console.log(`Item created: ${newItem}, Item ID: ${newItem._id}`);
-    // Return the created item in the response
+
     res.status(201).json(newItem);
   } catch (err) {
-    console.log('Error creating item:', err.message); // Log the error to terminal
+    console.log('Error creating item:', err.message);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
@@ -91,6 +86,30 @@ const deleteItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found' });
     }
     res.json({ message: 'Item deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+const likeItem = async (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    if (!itemId || !userId) {
+      return res
+        .status(400)
+        .json({ message: 'Item ID and User ID are required' });
+    }
+
+    const existingLike = await Like.findOne({ user: userId, item: itemId });
+    if (existingLike) {
+      return res.status(400).json({ message: 'Item already liked' });
+    }
+
+    const like = new Like({ user: userId, item: itemId });
+    await like.save();
+    res.status(201).json(like);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

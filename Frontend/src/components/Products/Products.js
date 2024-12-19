@@ -4,6 +4,7 @@ import { FaHeart, FaStar } from 'react-icons/fa';
 import { AuthContext } from '../../context/AuthContext';
 import { CartContext } from '../../context/CartContext';
 import { useFavorites } from '../../context/FavoritesContext';
+import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
 import Api from '../../utils/Api';
 import BuyModal from '../Modals/BuyModal/BuyModal';
 import Card from '../Card/Card';
@@ -103,12 +104,13 @@ const Products = () => {
     <Card
       key={product._id}
       product={product}
+      isFeatured={product.isFeatured}
       isAdmin={false}
       onAddToCart={() => handleAddToCart(product)}
       onBuyNow={() => handleBuyNow(product)}
       onFavorite={() => toggleFavorite(product)}
       onClick={() => openPreview(product)}
-      showQuantity={true}
+      showQuantity={false}
     />
   );
 
@@ -153,73 +155,18 @@ const Products = () => {
           ))}
         </div>
         {renderCategory()}
-        {showPreview && (
-          <div className='products__preview-overlay'>
-            <div className='products__preview-container' ref={previewRef}>
-              <img
-                src={previewProduct.imageUrl}
-                alt={previewProduct.name}
-                className='products__preview-image'
-              />
-              <div className='products__preview-info'>
-                <h2>{previewProduct.name}</h2>
-                <p>{previewProduct.description}</p>
-                <p className='products__product-price'>
-                  ${previewProduct.price.toFixed(2)}
-                </p>
-                <div className='products__quantity-controls'>
-                  <button
-                    className='products__minus-btn'
-                    onClick={() =>
-                      setPreviewQuantity(Math.max(1, previewQuantity - 1))
-                    }
-                  >
-                    -
-                  </button>
-                  <span className='products__current-quantity'>
-                    {previewQuantity}
-                  </span>
-                  <button
-                    className='products__plus-btn'
-                    onClick={() => setPreviewQuantity(previewQuantity + 1)}
-                  >
-                    +
-                  </button>
-                </div>
-                <p className='card__price-per-quantity'>
-                  Total: $
-                  {(previewProduct.price * previewProduct.quantity).toFixed(2)}
-                </p>
-                {isLoggedIn ? (
-                  <div className='products__preview-actions'>
-                    <button
-                      className='products__preview-button'
-                      onClick={() => addToCart(previewProduct)}
-                    >
-                      Add to Cart
-                    </button>
-                    <button
-                      className='products__preview-button'
-                      onClick={() => handleBuyNow(previewProduct)}
-                    >
-                      Buy Now
-                    </button>
-                  </div>
-                ) : (
-                  <button className='products__preview-button'>
-                    Login to Order
-                  </button>
-                )}
-              </div>
-              <button
-                className='products__close-preview'
-                onClick={closePreview}
-              >
-                &times;
-              </button>
-            </div>
-          </div>
-        )}
+        <PreviewOverlay
+          isOpen={showPreview}
+          onClose={closePreview}
+          product={previewProduct}
+          isFeatured={previewProduct?.isFeatured}
+          isLiked={favorites?.some((fav) => fav._id === previewProduct?._id)}
+          quantity={previewQuantity}
+          onQuantityChange={(newQuantity) => setPreviewQuantity(newQuantity)}
+          onAddToCart={() => handleAddToCart(previewProduct)}
+          onBuyNow={() => handleBuyNow(previewProduct)}
+          onFavorite={toggleFavorite}
+        />
         {showBuyModal && (
           <BuyModal
             isOpen={showBuyModal}

@@ -20,14 +20,14 @@ const checkIfAdmin = async (token) => {
     return false;
   }
 };
-
 const handleResponse = async (response) => {
-  if (response.ok) {
-    return response.json();
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to fetch data');
   }
-
-  throw new Error('Network response was not ok');
+  return response.json();
 };
+
 const Api = {
   register: async (name, email, password) => {
     try {
@@ -171,6 +171,23 @@ const Api = {
     }
   },
 
+  // Like an item
+  likeItem: async (itemId, token) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/item/${itemId}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Error liking item:', error);
+      throw error;
+    }
+  },
+
   // Get User Orders
   getUserOrders: async (token) => {
     try {
@@ -263,10 +280,13 @@ const Api = {
       throw error;
     }
   },
-  updateCartQuantity: async (productId, newQuantity) => {
+  updateCartQuantity: async (productId, newQuantity, token) => {
+    console.log('Sending updateCartQuantity request:', {
+      productId,
+      newQuantity,
+    });
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/cart/update', {
+      const response = await fetch(`${BASE_URL}/api/cart/update`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -287,12 +307,44 @@ const Api = {
     }
   },
 
+  updateSavedItemQuantity: async (productId, newQuantity, token) => {
+    const response = await fetch(`${BASE_URL}/api/cart/saved/update`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ productId, newQuantity }),
+    });
+    return handleResponse(response);
+  },
+
+  getSavedItems: async (token) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/cart/saved`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch saved items');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching saved items:', error);
+      throw error;
+    }
+  },
+
   getCart: async (token) => {
     try {
       const response = await fetch(`${BASE_URL}/api/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return handleResponse(response);
+      const data = await handleResponse(response);
+
+      return data;
     } catch (error) {
       console.error('Failed to get cart:', error);
       throw error;

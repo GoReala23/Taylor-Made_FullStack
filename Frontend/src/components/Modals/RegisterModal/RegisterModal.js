@@ -10,6 +10,7 @@ const RegisterModal = ({ isOpen, onClose, onRegister, onSwitchToLogin }) => {
     e.preventDefault();
     onRegister(values);
     resetForm();
+    onClose();
   };
 
   return (

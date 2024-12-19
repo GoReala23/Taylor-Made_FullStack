@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
 import { CartContext } from '../../../context/CartContext';
 import './CartModal.css';
@@ -9,30 +9,33 @@ const CartModal = ({ isOpen = true, onClose }) => {
     cartItems,
     savedItems,
     removeFromCart,
-    updateCartItemQuantity,
     moveToCart,
     removeSavedItem,
     saveForLater,
     calculateCartTotal,
+    handleQuantityChange,
+    getSavedItems,
+    fetchCart,
   } = useContext(CartContext);
 
-  console.log('Initial cartItems:', JSON.stringify(cartItems, null, 2));
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await fetchCart();
+        await getSavedItems();
+      }
+    };
+    fetchData();
+  }, []);
 
-  const handleQuantityChange = (productId, newQuantity) => {
-    console.log(
-      'Quantity change for product ID:',
-      productId,
-      'New Quantity:',
-      newQuantity,
-    );
-    updateCartItemQuantity(productId, newQuantity);
-  };
-
-  console.log('cartItems:', JSON.stringify(cartItems, null, 2));
-  console.log('savedItems:', JSON.stringify(savedItems, null, 2));
+  useEffect(() => {
+    console.log('Cart items updated:', cartItems);
+    console.log('Saved items updated:', savedItems);
+  }, [cartItems, savedItems]);
 
   const renderCartItems = () => {
-    if (cartItems.length === 0) {
+    if (!cartItems || cartItems.length === 0) {
       return null;
     }
 
@@ -43,19 +46,20 @@ const CartModal = ({ isOpen = true, onClose }) => {
 
     return validItems.map((item, index) => {
       const { product, quantity } = item;
-
       return (
-        <li key={`${product._id}-${index}`} className='cart__modal-item'>
+        <li key={product._id || index} className='cart__modal-item'>
           {product && (
             <Card
-              product={item.product}
-              quantity={item.quantity}
+              product={product}
+              isFeatured={product.isFeatured}
+              quantity={quantity}
               onRemove={() => removeFromCart(product._id)}
               onSaveForLater={() => saveForLater(product._id)}
+              onMoveToCart={() => moveToCart(product._id)}
               showQuantity={true}
               initialQuantity={quantity}
               onQuantityChange={(newQuantity) =>
-                handleQuantityChange(product._id, newQuantity)
+                handleQuantityChange(product._id, newQuantity, false)
               }
             />
           )}
@@ -64,42 +68,36 @@ const CartModal = ({ isOpen = true, onClose }) => {
     });
   };
 
-  const uniqueSavedItems = [
-    ...new Map(savedItems.map((item) => [item._id, item])).values(),
-  ];
-  const renderSavedForLaterSection = () => (
-    <section className='cart__modal-saved-section'>
-      <h3 className='cart__modal-section-header'>Saved for Later</h3>
-      {uniqueSavedItems.length > 0 ? (
+  const renderSavedForLaterSection = () => {
+    return (
+      <section className='cart__modal-saved-section'>
+        <h3 className='cart__modal-section-header'>Saved for Later</h3>
         <ul className='cart__modal-items'>
-          {uniqueSavedItems.map((item, index) => (
-            <li key={`${item._id}-${index}`} className='cart__modal-item'>
-              <Card
-                isSavedItem={true}
-                product={{
-                  _id: item._id,
-                  name: item.name,
-                  price: item.price || 0,
-                  description: item.description,
-                  imageUrl: item.imageUrl,
-                  isFeatured: item.isFeatured,
-                }}
-                onMoveToCart={() => moveToCart(item._id)}
-                onRemove={() => removeSavedItem(item._id)}
-                showQuantity={true}
-                initialQuantity={item.quantity || 1}
-                onQuantityChange={(newQuantity) =>
-                  updateCartItemQuantity(item._id, newQuantity)
-                }
-              />
-            </li>
-          ))}
+          {savedItems.map((item, index) => {
+            const { product } = item;
+            if (!product || !product._id) {
+              return null;
+            }
+            return (
+              <li key={product._id || index} className='cart__saved-items'>
+                <Card
+                  isSavedItem={true}
+                  product={product}
+                  onMoveToCart={() => moveToCart(product._id)}
+                  onRemove={() => removeSavedItem(product._id)}
+                  showQuantity={true}
+                  initialQuantity={item.quantity}
+                  onQuantityChange={(newQuantity) =>
+                    handleQuantityChange(product._id, newQuantity, true)
+                  }
+                />
+              </li>
+            );
+          })}
         </ul>
-      ) : (
-        <p>You have no saved items.</p>
-      )}
-    </section>
-  );
+      </section>
+    );
+  };
 
   if (!isOpen) return null;
   const isBothSectionsEmpty = cartItems.length === 0 && savedItems.length === 0;
@@ -121,10 +119,10 @@ const CartModal = ({ isOpen = true, onClose }) => {
             <div className='cart__modal-summary'>
               <p>Total: ${calculateCartTotal()}</p>
             </div>
+            {savedItems.length > 0 && renderSavedForLaterSection()}
             <button className='cart__modal-checkout-btn'>
               Proceed to Checkout
             </button>
-            {renderSavedForLaterSection()}
           </>
         )}
       </div>

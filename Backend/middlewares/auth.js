@@ -18,7 +18,7 @@ const auth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = { _id: decoded.userId.toString() };
+    req.user = { _id: decoded.userId.toString(), isAdmin: decoded.isAdmin };
     console.log('Verified user ID:', req.user._id);
     next();
   } catch (err) {

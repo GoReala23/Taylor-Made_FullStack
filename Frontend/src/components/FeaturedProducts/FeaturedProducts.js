@@ -1,10 +1,8 @@
-// File: c:\Users\tkbur\OneDrive\Desktop\Hassan'sProject\Taylor-Made\Taylor-Made_FullStack\frontend\src\components\FeaturedProducts\FeaturedProducts.js
-
 import React, { useContext, useState } from 'react';
+import { FaHeart, FaStar } from 'react-icons';
 import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { AuthContext } from '../../context/AuthContext';
-import { FaHeart, FaStar } from 'react-icons/fa';
 import './FeaturedProducts.css';
 
 const FeaturedProducts = () => {

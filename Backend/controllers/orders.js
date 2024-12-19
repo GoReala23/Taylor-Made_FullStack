@@ -141,7 +141,7 @@ const getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id }).populate(
       'item',
-      'name imageUrl'
+      'name price imageUrl description isFeatured'
     );
     res.json(orders);
   } catch (err) {

@@ -5,7 +5,6 @@ const {
   getItemById,
   updateItem,
   deleteItem,
-  // bulkCreateItems,
 } = require('../controllers/item');
 // const adminMiddleware = require('../middlewares/admin');
 const { likeItem, unlikeItem } = require('../controllers/likes');
@@ -60,7 +59,7 @@ router.put('/:id', auth, updateItem);
 router.delete('/:id', auth, deleteItem);
 
 // Like an item
-router.post('/:itemId/like', likeItem);
+router.post('/:itemId/like', auth, likeItem);
 
 // Unlike an item
 router.delete('/:itemId/like', auth, unlikeItem);

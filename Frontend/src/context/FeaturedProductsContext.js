@@ -9,7 +9,7 @@ export const FeaturedProductsProvider = ({ children }) => {
   const fetchFeaturedProducts = async () => {
     try {
       const fetchedProducts = await Api.getFeaturedProducts();
-      console.log('Fetched featured products:', fetchedProducts);
+
       setFeaturedProducts(fetchedProducts);
     } catch (error) {
       console.error('Error fetching featured products:', error);

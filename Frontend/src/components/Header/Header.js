@@ -1,11 +1,24 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import LoginModal from '../Modals/LoginModal/LoginModal';
 import './Header.css';
 import logo from '../../images/logo.webp';
 
 const Header = () => {
   const { isLoggedIn, logout, user } = useContext(AuthContext);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { login } = useContext(AuthContext);
+
+  const handleLoginClick = (e) => {
+    e.preventDefault();
+    setShowLoginModal(true);
+  };
+
+  const formTabSwitch = () => {
+    setShowLoginModal(!showLoginModal);
+  };
 
   return (
     <header className='header'>
@@ -32,11 +45,21 @@ const Header = () => {
             </button>
           </div>
         ) : (
-          <Link to='/login' className='header__nav-link'>
+          <Link
+            to='/login'
+            className='header__nav-link'
+            onClick={handleLoginClick}
+          >
             Login
           </Link>
         )}
       </nav>
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLogin={login}
+        onSwitchToRegister={formTabSwitch}
+      />
     </header>
   );
 };

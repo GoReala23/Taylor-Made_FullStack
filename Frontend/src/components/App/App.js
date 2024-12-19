@@ -13,6 +13,7 @@ import About from '../About/About';
 import Locations from '../Locations/Locations';
 import LandingPage from '../LandingPage/LandingPage';
 import CartModal from '../Modals/CartModal/CartModal';
+import Footer from '../Footer/Footer';
 import './App.css';
 
 const App = () => {
@@ -48,6 +49,7 @@ const App = () => {
         <Route path='/about' element={<About />} />
         <Route path='/locations' element={<Locations />} />
       </Routes>
+      <Footer />
     </div>
   );
 };

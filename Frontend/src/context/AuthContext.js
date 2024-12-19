@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }) => {
           const user = await Auth.getCurrentUser(token);
           setCurrentUser(user);
           setIsLoggedIn(true);
-          console.log('User:', user);
         } catch (error) {
           localStorage.removeItem('token');
           setCurrentUser(null);
@@ -64,7 +63,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', response.token);
       setCurrentUser(response.user);
       setIsLoggedIn(true);
-      navigate('/dashboard'); // Redirect to dashboard after login
+      navigate('/dashboard');
     } catch (error) {
       alert('Login failed. Please check your credentials.');
     }

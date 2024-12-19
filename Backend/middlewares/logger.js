@@ -36,7 +36,6 @@ const errorLogger = expressWinston.errorLogger({
   ],
 });
 
-// export the loggers
 module.exports = {
   requestLogger,
   errorLogger,

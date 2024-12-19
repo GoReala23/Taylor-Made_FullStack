@@ -59,7 +59,7 @@
   height: 160px;
   width: 300px;
   position: relative;
-  top: -90px;
+  top: -15px;
   right: -10px;
 }
 
@@ -80,8 +80,8 @@
   position: relative;
 }
 .landing__button {
-  width: 600px; /* Increased from 500px */
-  height: 600px; /* Increased from 500px */
+  width: 600px;
+  height: 600px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -101,7 +101,7 @@
 
 .landing__button:hover {
   transform: scale(0.75);
-  color: #fff;
+  color: #8b4513;
   font-size: 3rem; /* Increased from 2rem */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }

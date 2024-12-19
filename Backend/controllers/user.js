@@ -24,11 +24,11 @@ const setupTwoFactor = async (req, res) => {
       length: 20,
     });
 
-    user.twoFactorSecret = secret.base32; // Save the secret in base32 format
+    user.twoFactorSecret = secret.base32;
     await user.save();
 
     const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url);
-    console.log('Generated Secret:', secret.base32); // Debugging Log
+
     res.json({ secret: secret.base32, qrCodeUrl });
   } catch (error) {
     console.error('Error setting up 2FA:', error);
