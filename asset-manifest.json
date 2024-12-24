@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/Taylor-Made_FullStack/static/css/main.c6960680.css",
-    "main.js": "/Taylor-Made_FullStack/static/js/main.a483f700.js",
+    "main.css": "/Taylor-Made_FullStack/static/css/main.955db7db.css",
+    "main.js": "/Taylor-Made_FullStack/static/js/main.7144420f.js",
     "static/js/453.8ab44547.chunk.js": "/Taylor-Made_FullStack/static/js/453.8ab44547.chunk.js",
     "static/media/Taylor-Made_Title.webp": "/Taylor-Made_FullStack/static/media/Taylor-Made_Title.26ef1c5ad02203c5d035.webp",
     "static/media/home__page-bkgrd.webp": "/Taylor-Made_FullStack/static/media/home__page-bkgrd.80e5f826ffa6efd34c3a.webp",
@@ -10,12 +10,12 @@
     "static/media/landing_background.webp": "/Taylor-Made_FullStack/static/media/landing_background.6f8fec2dbc8902a8e88d.webp",
     "static/media/logo.webp": "/Taylor-Made_FullStack/static/media/logo.c22228b1770c44f1c07f.webp",
     "index.html": "/Taylor-Made_FullStack/index.html",
-    "main.c6960680.css.map": "/Taylor-Made_FullStack/static/css/main.c6960680.css.map",
-    "main.a483f700.js.map": "/Taylor-Made_FullStack/static/js/main.a483f700.js.map",
+    "main.955db7db.css.map": "/Taylor-Made_FullStack/static/css/main.955db7db.css.map",
+    "main.7144420f.js.map": "/Taylor-Made_FullStack/static/js/main.7144420f.js.map",
     "453.8ab44547.chunk.js.map": "/Taylor-Made_FullStack/static/js/453.8ab44547.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c6960680.css",
-    "static/js/main.a483f700.js"
+    "static/css/main.955db7db.css",
+    "static/js/main.7144420f.js"
   ]
 }
