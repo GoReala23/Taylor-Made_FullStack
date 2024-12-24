@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import './Orders.css';
+import { formatProductData } from '../Card/Card';
 import Api from '../../utils/Api';
 
 const Orders = () => {
@@ -61,15 +62,24 @@ const Orders = () => {
                   <span>Status: {order.status}</span>
                 </div>
                 <div className='orders__item-details'>
-                  {order.item.map((product) => (
-                    <div key={product._id} className='orders__product-card'>
-                      <img src={product.imageUrl} alt={product.name} />
-                      <div>
-                        <p>{product.name}</p>
-                        <p>${product.price.toFixed(2)}</p>
+                  {order.item.map((product) => {
+                    const formattedProduct = formatProductData(product);
+                    return (
+                      <div
+                        key={formattedProduct._id}
+                        className='orders__product-card'
+                      >
+                        <img
+                          src={formattedProduct.imageUrl}
+                          alt={formattedProduct.name}
+                        />
+                        <div>
+                          <p>{formattedProduct.name}</p>
+                          <p>${formattedProduct.price.toFixed(2)}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className='orders__item-footer'>
                   <p>Date: {new Date(order.createdAt).toLocaleDateString()}</p>

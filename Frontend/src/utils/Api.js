@@ -281,6 +281,7 @@ const Api = {
     }
   },
   updateCartQuantity: async (productId, newQuantity, token) => {
+    console.log('API call - updateCartQuantity:', { productId, newQuantity });
     console.log('Sending updateCartQuantity request:', {
       productId,
       newQuantity,
@@ -296,27 +297,47 @@ const Api = {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update cart quantity');
       }
 
-      const data = await response.json();
-      return data;
+      return await response.json();
     } catch (error) {
       console.error('Error updating cart quantity:', error);
       throw error;
     }
   },
 
-  updateSavedItemQuantity: async (productId, newQuantity, token) => {
-    const response = await fetch(`${BASE_URL}/api/cart/saved/update`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ productId, newQuantity }),
+  updateSavedItemQuantity: async (savedItemId, newQuantity, token) => {
+    console.log('API call - updateSavedItemQuantity:', {
+      savedItemId,
+      newQuantity,
     });
-    return handleResponse(response);
+    console.log('Sending updateSavedItemQuantity request:', {
+      savedItemId,
+      newQuantity,
+      token,
+    });
+    try {
+      const response = await fetch(`${BASE_URL}/api/cart/saved/update`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ savedItemId, newQuantity }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || 'Failed to update saved item quantity',
+        );
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating saved item quantity:', error);
+      throw error;
+    }
   },
 
   getSavedItems: async (token) => {

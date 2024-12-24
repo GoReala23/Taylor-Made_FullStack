@@ -1,9 +1,19 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
 import { FaHeart, FaStar, FaPlus, FaMinus } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 import { useFavorites } from '../../context/FavoritesContext';
 import './Card.css';
 import { CartContext } from '../../context/CartContext';
+
+export const formatProductData = (productFormatted) => {
+  if (!productFormatted) return null;
+  return {
+    ...productFormatted,
+    imageUrl: productFormatted.imageUrl.startsWith('http')
+      ? productFormatted.imageUrl
+      : `http://localhost:5000${productFormatted.imageUrl}`,
+  };
+};
 
 const Card = ({
   product,
@@ -19,43 +29,48 @@ const Card = ({
   initialQuantity = 1,
   showQuantity = false,
   isFeatured,
+  cartCardSize,
   ...props
 }) => {
-  const { favorites, toggleFavorite } = useFavorites();
+  const { favorites } = useFavorites();
   const [quantity, setQuantity] = useState(initialQuantity);
-  const { handleQuantityChange } = useContext(CartContext);
+  const {
+    handleQuantityChange,
+    updateSavedItemQuantity,
+    updateCartItemQuantity,
+  } = useContext(CartContext);
 
   const isLiked = favorites?.some((fav) => fav._id === product._id);
+  const [localQuantity, setLocalQuantity] = useState(initialQuantity);
 
-  const {
-    name = 'Unnamed Product',
-    price = 0,
-    description = 'No description',
-    imageUrl = '/default-image.jpg',
-  } = product;
+  const formattedProduct = useMemo(() => formatProductData(product), [product]);
 
-  if (!name || !imageUrl) {
+  if (!formattedProduct) {
     console.warn('Incomplete product data:', product);
     return null;
   }
 
-  const handleInputChange = (e) => {
-    const newQuantity = parseInt(e.target.value, 10);
-    if (!Number.isNaN(newQuantity)) {
-      handleQuantityChange(product._id, newQuantity, isSavedItem);
-      setQuantity(newQuantity);
-    }
-  };
+  const { name, price, description, imageUrl } = formattedProduct;
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
     onAddToCart(product, quantity);
   };
 
+  const handleQuantityUpdate = async (newQuantity) => {
+    try {
+      setLocalQuantity(newQuantity);
+      await handleQuantityChange(product._id, newQuantity, isSavedItem);
+    } catch (error) {
+      setLocalQuantity(localQuantity);
+      console.error('Error updating quantity:', error);
+    }
+  };
+
   return (
     <div
-      className='card'
-      onClick={() => props.onClick && props.onClick(product)}
+      className={`card ${cartCardSize ? 'card__cart-modal' : ''}`}
+      onClick={() => props.onClick && props.onClick(formattedProduct)}
     >
       <div className='card__image-container'>
         <img src={imageUrl} alt={name} className='card__image' />
@@ -65,7 +80,7 @@ const Card = ({
           onClick={(e) => {
             e.stopPropagation();
             if (onFavorite) {
-              onFavorite(product);
+              onFavorite(formattedProduct);
             }
           }}
         >
@@ -123,29 +138,21 @@ const Card = ({
       </div>
       {showQuantity && (
         <div className='card__quantity'>
-          <button
-            onClick={() =>
-              handleQuantityChange(product._id, quantity - 1, isSavedItem)
-            }
-          >
+          <button onClick={() => handleQuantityUpdate(localQuantity - 1)}>
             <FaMinus />
           </button>
           <input
             className='card__quantity-input'
             type='number'
-            value={quantity}
-            onChange={handleInputChange}
+            value={localQuantity}
+            onChange={(e) => handleQuantityUpdate(parseInt(e.target.value, 10))}
             min='1'
           />
-          <button
-            onClick={() =>
-              handleQuantityChange(product._id, quantity + 1, isSavedItem)
-            }
-          >
+          <button onClick={() => handleQuantityUpdate(localQuantity + 1)}>
             <FaPlus />
           </button>
           <p className='card__price-per-quantity'>
-            Total: ${(price * quantity).toFixed(2)}
+            Total: ${(price * localQuantity).toFixed(2)}
           </p>
         </div>
       )}

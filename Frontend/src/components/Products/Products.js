@@ -7,7 +7,7 @@ import { useFavorites } from '../../context/FavoritesContext';
 import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
 import Api from '../../utils/Api';
 import BuyModal from '../Modals/BuyModal/BuyModal';
-import Card from '../Card/Card';
+import Card, { formatProductData } from '../Card/Card';
 import useOutsideClick from '../../hooks/useOutsideClick';
 import './Products.css';
 
@@ -65,9 +65,10 @@ const Products = () => {
   }, []);
 
   const openPreview = (product) => {
+    const formattedProduct = formatProductData(product);
     console.log('Opening preview for:', product);
     setShowPreview(true);
-    setPreviewProduct(product);
+    setPreviewProduct(formattedProduct);
     setPreviewQuantity(1);
   };
 

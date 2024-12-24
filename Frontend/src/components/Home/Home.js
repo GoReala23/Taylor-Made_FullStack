@@ -6,7 +6,7 @@ import { useFavorites } from '../../context/FavoritesContext';
 import { CartContext } from '../../context/CartContext';
 import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
 import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
-import Card from '../Card/Card';
+import Card, { formatProductData } from '../Card/Card';
 import Api from '../../utils/Api';
 import './Home.css';
 
@@ -19,6 +19,7 @@ const Home = () => {
     removeFromCart,
     fetchCart,
     saveForLater,
+
     updateCartItemQuantity,
   } = useContext(CartContext);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,9 +34,12 @@ const Home = () => {
   const [previewQuantity, setPreviewQuantity] = useState(1);
   const previewRef = useRef(null);
 
+  console.log('Passing product to Card:', products);
+
   const openPreview = (product) => {
+    const formattedProduct = formatProductData(product);
     setShowPreview(true);
-    setPreviewProduct(product);
+    setPreviewProduct(formattedProduct);
     setPreviewQuantity(1);
   };
 
@@ -74,6 +78,7 @@ const Home = () => {
       try {
         setIsLoading(true);
         const fetchedProducts = await Api.getItems();
+        console.log('Fetched Products:', fetchedProducts); // Debugging
         const validProducts = fetchedProducts.filter(
           (product) =>
             product && product.name && product.price && product.imageUrl,

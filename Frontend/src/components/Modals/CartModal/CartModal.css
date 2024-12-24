@@ -2,6 +2,7 @@
   margin: 130px 0 0 0;
   background: rgba(0, 0, 0, 0.7);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -10,38 +11,73 @@
 .cart__modal-content {
   background-color: rgba(246, 224, 158, 0.95);
   border: 5px solid #8b4513;
+  align-items: center;
   padding: 20px;
   border-radius: 8px;
-  width: 100vh;
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1500px;
+}
+
+.cart__modal-section {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.cart__modal-section-header {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #8b4513;
 }
 
 .cart__modal-items {
-  width: 25vh;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   padding: 20px;
-}
-
-.cart__modal-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.cart__modal-saved-section {
+  justify-items: center;
   width: 100%;
 }
 
-.cart__modal-saved-section .cart__saved-items {
+.card__cart-modal {
+  height: auto;
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 2fr));
-  gap: 20px;
-  padding: 20px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.card__cart-modal .card__image-container {
+  height: 150px;
+  overflow: hidden;
+}
+
+.card__cart-modal .card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card__cart-modal .card__info {
+  text-align: center;
+  padding: 10px;
+}
+
+.card__cart-modal .card__title {
+  font-size: 1.2rem;
+}
+
+.card__cart-modal .card__price {
+  font-size: 1rem;
+}
+
+.card__cart-modal .card__actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.card__cart-modal .card__quantity {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
 }

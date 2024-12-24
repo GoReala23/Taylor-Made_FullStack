@@ -58,67 +58,41 @@ const removeItemFromCart = async (req, res, next) => {
 
 // Update item quantity in cart
 
-const updateCartItemQuantity = async (req, res, next) => {
-  const { productId, newQuantity } = req.body;
-  const userId = req.user._id;
-
+const updateCartItemQuantity = async (productId, newQuantity) => {
   try {
-    // Find the cart for the user
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
-
-    // Find the item in the cart
-    const itemIndex = cart.items.findIndex(
-      (item) => item.product.toString() === productId
+    const token = localStorage.getItem('token');
+    const response = await Api.updateCartQuantity(
+      productId,
+      newQuantity,
+      token
     );
-
-    // If the item is not found, return an error
-    if (itemIndex === -1) {
-      return res.status(404).json({ message: 'Item not found in cart' });
+    if (response && response.cart) {
+      setCartItems((prev) =>
+        prev.map((item) =>
+          item.product._id === productId
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
+      );
     }
-
-    // Update the quantity of the item
-    cart.items[itemIndex].quantity = newQuantity;
-    await cart.save();
-
-    res
-      .status(200)
-      .json({ message: 'Cart item quantity updated successfully', cart });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'Error updating cart', error: error.message });
+    console.error('Error updating cart quantity:', error);
   }
 };
 // Update saved item quantity
-const updateSavedItemQuantity = async (req, res) => {
-  const { savedItemId, newQuantity } = req.body;
-  const userId = req.user._id;
+const updateSavedItemQuantity = async (savedItemId, newQuantity) => {
   try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Find the saved item by its _id
-    const savedItem = user.savedItems.find(
-      (item) => item._id.toString() === savedItemId
+    const token = localStorage.getItem('token');
+    const response = await Api.updateSavedItemQuantity(
+      savedItemId,
+      newQuantity,
+      token
     );
-    if (!savedItem) {
-      return res.status(404).json({ error: 'Saved item not found' });
+    if (response && response.savedItems) {
+      setSavedItems(response.savedItems);
     }
-
-    savedItem.quantity = newQuantity;
-    await user.save();
-
-    res.status(200).json({
-      message: 'Saved item quantity updated successfully',
-      savedItems: user.savedItems,
-    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error updating saved item quantity:', error);
   }
 };
 // Get cart contents

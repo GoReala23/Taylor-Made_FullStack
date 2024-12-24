@@ -13,12 +13,18 @@
 }
 
 .orders__container {
+  display: flex;
   max-width: 1200px;
   margin: 0 auto;
   background: rgba(246, 224, 158, 0.9);
   border: 5px solid #8b4513;
   padding: 20px;
   border-radius: 8px;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .orders__title {

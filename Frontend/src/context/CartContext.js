@@ -44,28 +44,17 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('savedItems', JSON.stringify(savedItems));
   }, [savedItems]);
 
-  const addToCart = async (product, quantity = 1) => {
+  const addToCart = async ({ productId, quantity }) => {
+    if (!productId) {
+      throw new Error('Product ID is required');
+    }
+    if (!quantity || typeof quantity !== 'number') {
+      throw new Error('Valid quantity is required');
+    }
     try {
       const token = localStorage.getItem('token');
-      const existingItemIndex = cartItems.findIndex(
-        (item) => item.product._id === product._id,
-      );
-      if (existingItemIndex !== -1) {
-        // Update existing item quantity
-        const updatedItems = [...cartItems];
-        updatedItems[existingItemIndex].quantity += quantity;
-        setCartItems(updatedItems);
-        // Update in backend
-        await Api.updateCartQuantity(
-          product._id,
-          updatedItems[existingItemIndex].quantity,
-          token,
-        );
-      } else {
-        // Add new item
-        await Api.addToCart({ productId: product._id, quantity }, token);
-        await fetchCart();
-      }
+      await Api.addToCart({ productId, quantity }, token);
+      await fetchCart(); // Refresh cart contents
     } catch (error) {
       console.error('Error adding to cart:', error);
       throw error;
@@ -98,27 +87,34 @@ export const CartProvider = ({ children }) => {
         newQuantity,
         token,
       );
-      if (response.error) {
-        throw new Error(response.error);
+
+      if (response && response.cart) {
+        setCartItems(response.cart.items);
+      } else {
+        console.warn('Unexpected response format from API:', response);
       }
-      await fetchCart(); // Refresh cart contents
     } catch (error) {
       console.error('Error updating cart quantity:', error);
-      throw error;
     }
   };
-
-  const updateSavedItemQuantity = async (productId, newQuantity) => {
+  const updateSavedItemQuantity = async (savedItemId, newQuantity) => {
     try {
       const token = localStorage.getItem('token');
-      await Api.updateSavedItemQuantity(productId, newQuantity, token);
-      await getSavedItems();
+      const response = await Api.updateSavedItemQuantity(
+        savedItemId,
+        newQuantity,
+        token,
+      );
+
+      if (response && response.savedItems) {
+        setSavedItems(response.savedItems);
+      } else {
+        console.warn('Unexpected response format from API:', response);
+      }
     } catch (error) {
       console.error('Error updating saved item quantity:', error);
-      throw error;
     }
   };
-
   const removeFromCart = async (productId) => {
     try {
       const token = localStorage.getItem('token');
@@ -194,42 +190,23 @@ export const CartProvider = ({ children }) => {
       throw error;
     }
   };
-
-  const handleQuantityChange = async (productId, newQuantity, isSavedItem) => {
+  const handleQuantityChange = async (id, newQuantity, isSavedItem) => {
     try {
-      console.log('Updating quantity:', {
-        productId,
-        newQuantity,
-        isSavedItem,
-      });
       if (isSavedItem) {
-        await updateSavedItemQuantity(productId, newQuantity);
-        setSavedItems((prev) =>
-          prev.map((item) => {
-            if (item.product._id === productId) {
-              console.log('Updated saved item quantity:', newQuantity);
-              return { ...item, quantity: newQuantity };
-            }
-            return item;
-          }),
-        );
+        const response = await updateSavedItemQuantity(id, newQuantity);
+        if (response && response.savedItems) {
+          setSavedItems(response.savedItems);
+        }
       } else {
-        await updateCartItemQuantity(productId, newQuantity);
-        setCartItems((prev) =>
-          prev.map((item) => {
-            if (item.product._id === productId) {
-              console.log('Updated cart item quantity:', newQuantity);
-              return { ...item, quantity: newQuantity };
-            }
-            return item;
-          }),
-        );
+        const response = await updateCartItemQuantity(id, newQuantity);
+        if (response && response.cart) {
+          setCartItems(response.cart.items);
+        }
       }
     } catch (error) {
       console.error('Error updating quantity:', error);
     }
   };
-
   return (
     <CartContext.Provider
       value={{

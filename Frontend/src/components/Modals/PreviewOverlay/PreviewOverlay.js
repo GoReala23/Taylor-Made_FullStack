@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { FaHeart, FaStar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../../../context/CartContext';
+import { formatProductData } from '../../Card/Card';
 import BuyModal from '../BuyModal/BuyModal';
 import './PreviewOverlay.css';
 
@@ -21,11 +22,17 @@ const PreviewOverlay = ({
 
   if (!isOpen || !product) return null;
 
+  const formattedProduct = formatProductData(product);
+
   const handleAddToCart = async () => {
+    if (!product || !product._id) {
+      console.error('Unable to add to cart: missing product data');
+      return;
+    }
     try {
       await addToCart({
         productId: product._id,
-        quantity: { quantity },
+        quantity,
       });
     } catch (err) {
       console.error('Error adding to cart:', err);
@@ -69,15 +76,15 @@ const PreviewOverlay = ({
               onClick={(e) => {
                 e.stopPropagation();
                 if (onFavorite) {
-                  onFavorite(product);
+                  onFavorite(formattedProduct);
                 }
               }}
             />
           </div>
         </div>
-        <h3 className='preview__title'>{product.name}</h3>
-        <p className='preview__description'>{product.description}</p>
-        <p className='preview__price'>${product.price}</p>
+        <h3 className='preview__title'>{formattedProduct.name}</h3>
+        <p className='preview__description'>{formattedProduct.description}</p>
+        <p className='preview__price'>${formattedProduct.price}</p>
         <div className='preview__quantity-controls'>
           <button onClick={() => onQuantityChange(Math.max(1, quantity - 1))}>
             -
