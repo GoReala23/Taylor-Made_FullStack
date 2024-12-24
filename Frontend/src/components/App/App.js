@@ -25,10 +25,10 @@ const App = () => {
       {isLoggedIn && <Dashboard />}
       <Routes>
         <Route path='/' element={isLoggedIn ? <Home /> : <LandingPage />} />
-        <Route
+        {/* <Route
           path='/dashboard'
           element={isLoggedIn ? <Home /> : <Navigate to='/login' />}
-        />
+        /> */}
         <Route path='/products' element={<Products />} />
         <Route
           path='/profile'

@@ -27,7 +27,7 @@
 
 .landing__title-container {
   position: relative;
-  margin-top: 40px;
+  margin-top: -30px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
