@@ -1,9 +1,14 @@
 # Dependencies
 node_modules/
+.env
+*.log
+# Archive and media files
 *.zip
 *.mp4
 *.lnk
 *.PNG
+
+# System files
 desktop.ini
 *.txt
 
@@ -21,10 +26,8 @@ pids
 *.seed
 *.pid.lock
 
-# IDE specific files
+# IDE Specific Files
 .idea/
 .vscode/
 *.swp
 *.swo
-
-

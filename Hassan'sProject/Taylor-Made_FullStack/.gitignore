@@ -1,3 +1,32 @@
-node_modules
+node_modules/
+**/node_modules/
 
-.codegpt
+
+
+
+# Ignore files from two levels up
+*.mp4
+*.lnk
+*.zip
+*.PNG
+desktop.ini
+*.txt
+
+# Ignore parent directories except Taylor-Made_FullStack
+../../*
+../*
+!../../Taylor-Made_FullStack/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+request.log
+error.log
+
+# IDE Specific Files
+.idea/
+.vscode/
+*.swp
+*.swo
