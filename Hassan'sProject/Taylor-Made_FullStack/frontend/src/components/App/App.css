@@ -1,0 +1,9 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+  padding: 0;
+}

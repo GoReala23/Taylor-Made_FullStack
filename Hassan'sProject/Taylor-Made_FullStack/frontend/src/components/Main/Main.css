@@ -1,0 +1,50 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-image: url('../../images/site_background.webp');
+  background-size: cover;
+  background-position: center;
+}
+
+.main__title {
+  font-size: 3rem;
+  font-family: 'Cursive', sans-serif;
+  color: #8b4513;
+  margin-bottom: 10px;
+}
+
+.main__subtitle {
+  font-size: 1.5rem;
+  color: #6b4226;
+  margin-bottom: 20px;
+}
+
+.main__buttons {
+  display: flex;
+  gap: 20px;
+}
+
+.main__button {
+  padding: 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.main__button--fridge {
+  background-color: #4682b4;
+}
+
+.main__button--oven {
+  background-color: #d2691e;
+}
+
+.main__button:hover {
+  transform: scale(1.1);
+}
