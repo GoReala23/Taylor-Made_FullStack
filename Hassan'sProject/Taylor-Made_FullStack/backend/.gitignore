@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+*.zip
+*.mp4
+*.lnk
+*.PNG
+desktop.ini
+*.txt
+
+# Environment variables
+.env
+
+# Logs
+*.log
+request.log
+error.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+
