@@ -1,0 +1,91 @@
+body,
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.page {
+  font-family: 'Inter', sans-serif;
+  background: #eeeeee; 
+}
+
+.header {
+  height: 100vh;
+  /* add missing declarations */
+  background-image: url(./images/hassan\ porter.jpg);
+  background-size: auto;
+  background-position: center;
+  text-align: center;
+}
+
+/* add a CSS rule for the page title here */
+.title-me{
+  font-family: "Permanent Marker", cursive;
+  font-size: 140px;
+  line-height: 140px;
+  color: white;
+  text-transform: uppercase;
+  max-width: 1240px;
+  margin: auto;
+
+}
+.overlay {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex; 
+}
+
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  
+  /* add missing declarations */
+  max-width: 790px;
+  margin: 100px auto 50px;
+  
+}
+
+/* add CSS rules for cards and their content here */
+.card{
+  width: 350px;
+  margin-bottom: 60px;
+  padding: 45px 45px 70px;
+  box-shadow: 4px 4px 5px rgba(10, 132, 255, 0.4);
+  
+}
+.card-title{
+  font-family: "Permanent Marker", cursive;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.card-text{
+  font-size: 16px;
+}
+.card-image{
+  width: 100%;
+  margin-bottom: 25px;
+}
+
+.footer {
+  display: flex;
+  /* add missing declarations */
+  min-height: 300px;
+  background-color: #000000;
+
+}
+.footer-sig{
+  font-size: 24px;
+  background-color: #ffffff;
+}
+
+
+/* add a CSS rule for the footer signature */

@@ -1,0 +1,8 @@
+.header__title {
+  text-align: center;
+  color: brown;
+  font-size: 40px;
+  max-width: 220px;
+  margin: 0 auto 58px;
+  text-transform: uppercase;
+}

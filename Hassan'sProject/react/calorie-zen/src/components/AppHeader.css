@@ -1,0 +1,29 @@
+@font-face {
+  src: url(../components/fonts/RobotoCondensed-Italic-VariableFont_wght.ttf)
+    format("tff");
+  font-family: "Robotic Condensed";
+}
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+.header__logo {
+  width: 64px;
+  height: 64px;
+}
+.header__header {
+  font-size: 40px;
+  margin-left: 12px;
+}
+
+.header__header {
+  text-align: center;
+  font-size: 40px;
+  font-family: "Roboto Condesed", sans-serif;
+  color: chartreuse;
+  max-width: 2209x;
+  margin: 0 auto 58px;
+  text-transform: uppercase;
+}

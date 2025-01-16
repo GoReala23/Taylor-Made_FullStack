@@ -1,9 +1,3 @@
-node_modules/
-**/node_modules/
-
-
-
-
 # Ignore files from two levels up
 *.mp4
 *.lnk
@@ -15,6 +9,17 @@ desktop.ini
 # Ignore parent directories except Taylor-Made_FullStack
 ../../*
 ../*
+
+# Specific directories
+**/Hassan's SWE/
+**/Images/
+**/Inter-3.19/
+**/Projects Fonts/
+**/React Coding/
+**/frontend-authorization/
+**/pages/
+**/react/
+**/se_project_*/
 !../../Taylor-Made_FullStack/
 
 # Environment variables

@@ -1,7 +1,6 @@
 # Dependencies
 node_modules/
-.env
-*.log
+
 # Archive and media files
 *.zip
 *.mp4
@@ -13,7 +12,7 @@ desktop.ini
 *.txt
 
 # Environment variables
-.env
+# .env
 
 # Logs
 *.log
