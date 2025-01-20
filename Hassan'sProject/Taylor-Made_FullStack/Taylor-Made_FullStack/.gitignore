@@ -1,0 +1,37 @@
+# Ignore files from two levels up
+*.mp4
+*.lnk
+*.zip
+*.PNG
+desktop.ini
+*.txt
+
+# Ignore parent directories except Taylor-Made_FullStack
+../../*
+../*
+
+# Specific directories
+**/Hassan's SWE/
+**/Images/
+**/Inter-3.19/
+**/Projects Fonts/
+**/React Coding/
+**/frontend-authorization/
+**/pages/
+**/react/
+**/se_project_*/
+!../../Taylor-Made_FullStack/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+request.log
+error.log
+
+# IDE Specific Files
+.idea/
+.vscode/
+*.swp
+*.swo
