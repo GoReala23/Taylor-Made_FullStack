@@ -1,0 +1,71 @@
+
+# User-specific files
+.bash_history
+.bito/
+.bitowingman/
+.codegpt/
+.codeium/
+.dotnet/
+.eclipse/
+.gitconfig
+.lesshst
+.node_repl_history
+.p2/
+.ssh/
+.viminfo
+.vscode/
+
+# Windows specific
+NTUSER.*
+ntuser.*
+*.TxR.*
+*.TM.*
+*.regtrans-ms
+*.blf
+
+# User directories
+3D Objects/
+AppData/
+Application Data/
+Contacts/
+Cookies/
+Documents/
+Downloads/
+Favorites/
+IntelGraphicsProfiles/
+Links/
+Music/
+OneDrive/
+Pictures/
+Portal/
+Projects/
+RoughDraft/
+Saved Games/
+Searches/
+Videos/
+
+# Project specific
+
+node_modules/
+npm-cache/
+public/
+images/
+roughdraft/
+Frontend/
+**/Hassan's SWE/
+**/Hassan'sProject/
+**/Taylor-Made_FullStack/
+
+# File types
+*.lnk
+*.pdf
+*.zip
+*.docx
+*.png
+desktop.ini
+
+# Prevent accidental parent directory tracking
+../*
+../../*
+../../../*
+../../../../*
