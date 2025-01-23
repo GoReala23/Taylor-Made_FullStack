@@ -1,0 +1,148 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  z-index: 1000;
+}
+
+.modal__overlay {
+  /* position: absolute; */
+  width: 100%;
+  height: 100%;
+  background: none;
+}
+
+.modal__content {
+  position: relative;
+  background-color: rgba(246, 224, 158, 0.95);
+  padding: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+  z-index: 1001;
+}
+
+/* Tabs Styling */
+.modal__tabs {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.modal__tab {
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #8b4513;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.modal__tab.active {
+  border-bottom: 2px solid #8b4513;
+}
+
+/* Form Elements */
+.modal__title {
+  font-size: 24px;
+  margin-bottom: 16px;
+  text-align: center;
+  color: #8b4513;
+}
+
+.modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal__form-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  color: #8b4513;
+}
+
+.modal__form-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.modal__form-input:focus {
+  outline: none;
+  border-color: #8b4513;
+  box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.1);
+}
+
+/* Buttons */
+.modal__form-submit {
+  width: 100%;
+  padding: 12px;
+  background-color: #8b4513;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.modal__form-submit:hover {
+  background-color: #734010;
+}
+
+.modal__form-submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.modal__form-switch {
+  background: none;
+  border: none;
+  color: #8b4513;
+  cursor: pointer;
+  margin-bottom: 16px;
+  text-decoration: underline;
+  font-size: 14px;
+  width: 100%;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+.modal__form-switch:hover {
+  opacity: 0.8;
+}
+
+.modal__close-button:hover {
+  opacity: 0.8;
+}
+
+/* Error Handling */
+.modal__form-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.modal__error {
+  color: #dc3545;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 14px;
+}

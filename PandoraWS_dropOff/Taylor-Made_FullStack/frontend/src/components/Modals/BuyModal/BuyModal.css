@@ -1,0 +1,52 @@
+.modal__content {
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  background-color: rgba(246, 224, 158, 0.95);
+  width: 100%;
+  max-width: 500px;
+  z-index: 1001;
+}
+
+.modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  padding: 15px;
+}
+
+/* BuyModal Specific Styles */
+.buy__modal-title {
+  font-size: 24px;
+  margin-bottom: 16px;
+  text-align: center;
+  color: #8b4513;
+}
+
+.buy__modal-form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  color: #8b4513;
+}
+
+.buy__modal-form-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.buy__modal-form-input:focus {
+  outline: none;
+  border-color: #8b4513;
+  box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.1);
+}
+
+.buy__modal-form-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+}

@@ -1,0 +1,132 @@
+.orders {
+  min-height: 100vh;
+  padding: 30px;
+  margin-top: 130px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  color: #8b4513;
+  background: rgba(246, 224, 158, 0.95);
+}
+
+.orders__container {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: rgba(246, 224, 158, 0.9);
+  border: 5px solid #8b4513;
+  padding: 20px;
+  border-radius: 8px;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orders__title {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #8b4513;
+  font-weight: bold;
+}
+
+.orders__filters {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.orders__filter-select {
+  padding: 8px 15px;
+  border-radius: 4px;
+  border: 1px solid #8b4513;
+  background: #d2b48c;
+  color: #8b4513;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.orders__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.orders__item {
+  background: rgba(246, 224, 158, 0.8);
+  padding: 20px;
+  border-radius: 8px;
+  border: 5px solid #8b4513;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.orders__item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #8b4513;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.orders__item-header h3 {
+  font-size: 1.5rem;
+  color: #8b4513;
+}
+
+.orders__item-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.orders__product-card {
+  display: flex;
+  gap: 10px;
+  border: 1px solid #8b4513;
+  border-radius: 4px;
+  padding: 10px;
+  align-items: center;
+  background: rgba(246, 224, 158, 0.8);
+}
+
+.orders__product-card img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.orders__item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #8b4513;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.orders__item-footer p {
+  color: #8b4513;
+  font-weight: bold;
+}
+
+.orders__item-actions button {
+  background-color: #8b4513;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.orders__item-actions button:hover {
+  background-color: #a0522d;
+}

@@ -1,0 +1,19 @@
+.footer {
+  background: rgba(246, 224, 158, 0.95);
+  padding: 20px 0;
+  border-top: 5px solid #8b4513;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  color: #8b4513;
+  width: 1350px;
+  /* text-align: start; */
+}
+
+.footer__container {
+  margin: 0 auto;
+}
+
+.footer__text {
+  font-size: 1rem;
+  color: #8b4513;
+  left: 5px;
+}

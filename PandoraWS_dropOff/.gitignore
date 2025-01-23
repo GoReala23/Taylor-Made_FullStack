@@ -1,4 +1,4 @@
-
+.gitignore
 # User-specific files
 .bash_history
 .bito/
@@ -48,13 +48,13 @@ Videos/
 
 node_modules/
 npm-cache/
-public/
-images/
+# public/
+# images/
 roughdraft/
-Frontend/
+# Frontend/
 **/Hassan's SWE/
 **/Hassan'sProject/
-**/Taylor-Made_FullStack/
+# **/Taylor-Made_FullStack/
 
 # File types
 *.lnk

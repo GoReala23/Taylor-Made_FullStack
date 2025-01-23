@@ -1,0 +1,103 @@
+.preview__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.preview__container {
+  background: rgba(246, 224, 158, 0.95);
+  border: 5px solid #8b4513;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 500px;
+  max-height: 90vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.preview__close {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background: none;
+
+  border-radius: 100%;
+  width: 36px;
+  height: 36px;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.preview__image-container {
+  position: relative;
+  width: 100%;
+}
+
+.preview__image {
+  width: 100%;
+  max-height: 400px;
+  margin: 10px 0;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.preview__icons {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  display: flex;
+  justify-content: space-between;
+  width: 480px;
+}
+
+.preview__heart-icon {
+  margin-left: auto;
+}
+.preview__heart-icon.liked {
+  color: #8b4513;
+}
+
+.preview__heart-icon.unliked {
+  color: white;
+}
+
+.preview__star-icon,
+.preview__heart-icon {
+  cursor: pointer;
+}
+
+.preview__quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.preview__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.preview__button {
+  padding: 10px 20px;
+  background-color: #8b4513;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

@@ -1,0 +1,47 @@
+# Node Modules
+node_modules/
+
+# Build Output
+dist/
+build/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# System Files
+desktop.ini
+Thumbs.db
+.DS_Store
+*.swp
+*.swo
+
+# IDE Specific
+.idea/
+.vscode/
+
+# Temporary or Cache Files
+.cache/
+temp/
+tmp/
+coverage/
+
+# Media and Archive Files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.mp4
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# React and Vue Specific
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+public/static/

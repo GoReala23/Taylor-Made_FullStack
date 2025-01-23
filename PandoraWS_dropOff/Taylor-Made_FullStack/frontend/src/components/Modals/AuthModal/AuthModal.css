@@ -1,0 +1,25 @@
+.auth__modal {
+  background-color: rgba(210, 180, 140, 0.9);
+  padding: 2rem;
+  border-radius: 8px;
+  z-index: 2000;
+}
+
+.auth__modal-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.auth__modal-tab {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #8b4513;
+}
+
+.auth__modal-tab.active {
+  border-bottom: 2px solid #8b4513;
+}
