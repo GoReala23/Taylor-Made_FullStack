@@ -6,7 +6,9 @@
   background-size: 100%;
   width: 100%;
   min-height: 1280px;
-  padding-top: 20px;
+  height: 100vh;
+  /* padding-top: 20px; */
+  padding: 20px 0 0 40px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -64,13 +66,14 @@
 }
 
 .landing__subtitle {
-  font-size: 1.5rem;
-  margin-bottom: 3rem;
+  font-size: 2.5rem;
+  color: #060606;
+  text-shadow: #fff;
 }
 
 .landing__button-container {
   display: flex;
-  top: 80px;
+  top: 45px;
   justify-content: space-between;
   align-items: center;
   width: 80%;
@@ -80,8 +83,8 @@
   position: relative;
 }
 .landing__button {
-  width: 600px;
-  height: 600px;
+  width: 850px;
+  height: 850px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -91,6 +94,8 @@
   color: transparent;
   display: flex;
   justify-content: center;
+  width: 100vh;
+  height: 70vh;
   align-items: center;
   font-size: 0;
   transition:
@@ -107,7 +112,7 @@
 }
 
 .landing__button:focus-visible {
-  outline: 2px solid #00f;
+  outline: 2px solid rgba(255, 153, 0, 0.852);
   outline-offset: 4px;
 }
 
@@ -115,7 +120,7 @@
   background: url('../../images/buttons/plate_left-register.jpg') no-repeat
     center center;
   background-size: contain;
-  right: 160px;
+  right: 240px;
 }
 
 .landing__button-login {
